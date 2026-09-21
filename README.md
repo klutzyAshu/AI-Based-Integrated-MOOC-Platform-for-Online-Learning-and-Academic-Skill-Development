@@ -38,7 +38,7 @@ project/
 ## Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/klutzyAshu/AI-Based-Integrated-MOOC-Platform-for-Online-Learning-and-Academic-Skill-Development
 cd <project-folder>
 ```
 
