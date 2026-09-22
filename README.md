@@ -19,7 +19,7 @@ An AI-based MOOC platform designed to provide online courses, academic learning 
 
 * Frontend: HTML, CSS, JavaScript
 * Backend: TBD
-* Database: MySQL / MariaDB
+* Database: MariaDB (MySQL-compatible)
 * AI: AI/LLM-based assistant
 * Version Control: Git & GitHub
 

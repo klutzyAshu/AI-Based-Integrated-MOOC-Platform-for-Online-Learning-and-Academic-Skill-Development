@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: mooc-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MARIADB_DATABASE: mooc_platform
+    ports:
+      - "3306:3306"
+    volumes:
+      - mooc-db-data:/var/lib/mysql
+      - ./database/schema:/docker-entrypoint-initdb.d/schema
+      - ./database/database.sql:/docker-entrypoint-initdb.d/0-database.sql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: mooc-backend
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      JWT_SECRET: ${JWT_SECRET:-change-this-super-secret-key-in-prod-please-change}
+      AI_PROVIDER: ${AI_PROVIDER:-openai}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/mooc_platform
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./storage:/app/storage
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: mooc-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080/api
+
+volumes:
+  mooc-db-data:
