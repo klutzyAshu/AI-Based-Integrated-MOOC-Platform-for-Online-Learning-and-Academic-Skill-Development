@@ -8,6 +8,7 @@ export default function Dashboard() {
   const [courses, setCourses] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [error, setError] = useState("");
 
   const loadCourses = async () => {
     const { data } = await api.get(`/courses/instructor/${user.userId}`);
@@ -21,40 +22,50 @@ export default function Dashboard() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    await createCourse({ title, description, level: "BEGINNER" });
-    setTitle("");
-    setDescription("");
-    loadCourses();
+    setError("");
+    try {
+      await createCourse({ title, description, level: "BEGINNER" });
+      setTitle("");
+      setDescription("");
+      await loadCourses();
+    } catch (requestError) {
+      setError(requestError.response?.data?.error || "We couldn’t create the course. Please try again.");
+    }
   };
 
   const handlePublish = async (id) => {
-    await publishCourse(id);
-    loadCourses();
+    try {
+      await publishCourse(id);
+      await loadCourses();
+    } catch (requestError) {
+      setError(requestError.response?.data?.error || "We couldn’t publish the course. Please try again.");
+    }
   };
 
   return (
     <div>
-      <h2>Instructor Dashboard</h2>
+      <div className="page-heading"><div><span className="eyebrow">INSTRUCTOR SPACE</span><h2>Manage your courses</h2><p>Create a course and share it with learners.</p></div></div>
 
-      <form onSubmit={handleCreate} style={styles.form}>
+      {error && <p className="auth-error" role="alert">{error}</p>}
+      <form onSubmit={handleCreate} className="form-row">
         <input
-          style={styles.input}
+          className="input"
           placeholder="Course title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
         />
         <input
-          style={styles.input}
+          className="input"
           placeholder="Short description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <button style={styles.button} type="submit">Create Course</button>
+        <button className="button-primary" type="submit">Create course</button>
       </form>
 
-      <h3 style={{ marginTop: 32 }}>My Courses</h3>
-      <table style={styles.table}>
+      <h3 className="section-title">My courses</h3>
+      <div className="table-wrap"><table>
         <thead>
           <tr>
             <th align="left">Title</th>
@@ -71,7 +82,7 @@ export default function Dashboard() {
               <td>{c.published ? "Published" : "Draft"}</td>
               <td>
                 {!c.published && (
-                  <button style={styles.smallButton} onClick={() => handlePublish(c.id)}>
+                  <button className="button-primary" onClick={() => handlePublish(c.id)}>
                     Publish
                   </button>
                 )}
@@ -84,15 +95,8 @@ export default function Dashboard() {
             </tr>
           )}
         </tbody>
-      </table>
+      </table></div>
     </div>
   );
 }
 
-const styles = {
-  form: { display: "flex", gap: 8, marginTop: 16 },
-  input: { flex: 1, padding: 10, borderRadius: 6, border: "1px solid #ccc" },
-  button: { padding: "10px 16px", borderRadius: 6, border: "none", background: "#121212", color: "#fff", cursor: "pointer" },
-  smallButton: { padding: "4px 10px", borderRadius: 6, border: "none", background: "#121212", color: "#fff", cursor: "pointer" },
-  table: { width: "100%", borderCollapse: "collapse", marginTop: 12 },
-};

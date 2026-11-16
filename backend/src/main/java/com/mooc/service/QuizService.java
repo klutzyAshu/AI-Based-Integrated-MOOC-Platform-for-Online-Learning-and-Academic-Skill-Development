@@ -4,6 +4,7 @@ import com.mooc.dto.QuizRequest;
 import com.mooc.exception.ResourceNotFoundException;
 import com.mooc.model.*;
 import com.mooc.repository.QuizRepository;
+import com.mooc.repository.QuizAttemptRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,6 +18,7 @@ import java.util.List;
 public class QuizService {
 
     private final QuizRepository quizRepository;
+    private final QuizAttemptRepository quizAttemptRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Quiz findById(Long id) {
@@ -67,12 +69,37 @@ public class QuizService {
         List<Question> questions = quiz.getQuestions();
         if (questions.isEmpty()) return 0.0;
 
+        if (answers == null || answers.size() != questions.size()) {
+            throw new IllegalArgumentException("Submit one answer for each question");
+        }
+
         int correct = 0;
-        for (int i = 0; i < questions.size() && i < answers.size(); i++) {
-            if (questions.get(i).getCorrectIndex().equals(answers.get(i))) {
+        for (int i = 0; i < questions.size(); i++) {
+            Integer answer = answers.get(i);
+            if (answer == null || answer < 0 || answer > 3) {
+                throw new IllegalArgumentException("Answer indices must be between 0 and 3");
+            }
+            if (questions.get(i).getCorrectIndex().equals(answer)) {
                 correct++;
             }
         }
         return (correct * 100.0) / questions.size();
+    }
+
+    public QuizAttempt recordAttempt(Quiz quiz, User user, List<Integer> answers) {
+        double score = grade(quiz, answers);
+        QuizAttempt attempt = QuizAttempt.builder()
+                .user(user)
+                .quiz(quiz)
+                .score(score)
+                .passed(score >= quiz.getPassingScore())
+                .answersJson(writeAnswers(answers))
+                .build();
+        return quizAttemptRepository.save(attempt);
+    }
+
+    @SneakyThrows
+    private String writeAnswers(List<Integer> answers) {
+        return objectMapper.writeValueAsString(answers);
     }
 }

@@ -22,8 +22,8 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2>Admin Dashboard</h2>
-      <table style={styles.table}>
+      <div className="page-heading"><div><span className="eyebrow">ADMINISTRATION</span><h2>Manage users</h2><p>Review accounts, update access, and deactivate users.</p></div></div>
+      <div className="table-wrap"><table>
         <thead>
           <tr>
             <th align="left">Name</th>
@@ -47,7 +47,7 @@ export default function Dashboard() {
               </td>
               <td>{u.active ? "Yes" : "No"}</td>
               <td>
-                <button style={styles.button} onClick={() => handleDeactivate(u.id)}>
+                <button className="button-danger" onClick={() => handleDeactivate(u.id)}>
                   Deactivate
                 </button>
               </td>
@@ -59,12 +59,8 @@ export default function Dashboard() {
             </tr>
           )}
         </tbody>
-      </table>
+      </table></div>
     </div>
   );
 }
 
-const styles = {
-  table: { width: "100%", borderCollapse: "collapse", marginTop: 12 },
-  button: { padding: "4px 10px", borderRadius: 6, border: "none", background: "#c0392b", color: "#fff", cursor: "pointer" },
-};

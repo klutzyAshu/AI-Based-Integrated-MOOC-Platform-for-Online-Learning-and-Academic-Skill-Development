@@ -12,8 +12,12 @@ services:
       - "3306:3306"
     volumes:
       - mooc-db-data:/var/lib/mysql
-      - ./database/schema:/docker-entrypoint-initdb.d/schema
       - ./database/database.sql:/docker-entrypoint-initdb.d/0-database.sql
+      - ./database/schema/users.sql:/docker-entrypoint-initdb.d/1-users.sql
+      - ./database/schema/courses.sql:/docker-entrypoint-initdb.d/2-courses.sql
+      - ./database/schema/enrollments.sql:/docker-entrypoint-initdb.d/3-enrollments.sql
+      - ./database/schema/quizzes.sql:/docker-entrypoint-initdb.d/4-quizzes.sql
+      - ./database/schema/ai.sql:/docker-entrypoint-initdb.d/5-ai.sql
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s

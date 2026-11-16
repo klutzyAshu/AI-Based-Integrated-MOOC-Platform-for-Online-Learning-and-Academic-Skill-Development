@@ -9,11 +9,7 @@
 CREATE DATABASE IF NOT EXISTS mooc_platform CHARACTER SET utf8mb4;
 USE mooc_platform;
 
-SOURCE schema/users.sql;
-SOURCE schema/courses.sql;
-SOURCE schema/enrollments.sql;
-SOURCE schema/quizzes.sql;
-SOURCE schema/ai.sql;
-
 -- Uncomment to load sample data for local development:
--- SOURCE seed/sample_data.sql;
+-- Apply files in database/schema/ in dependency order, then optionally
+-- database/seed/sample_data.sql. Docker Compose mounts each schema file
+-- as an ordered MariaDB initialization script.

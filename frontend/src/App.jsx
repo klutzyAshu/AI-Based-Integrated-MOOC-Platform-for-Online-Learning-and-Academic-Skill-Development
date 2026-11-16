@@ -10,6 +10,14 @@ import CourseView from "./pages/student/CourseView.jsx";
 
 import InstructorDashboard from "./pages/instructor/Dashboard.jsx";
 import AdminDashboard from "./pages/admin/Dashboard.jsx";
+import { useAuth } from "./hooks/useAuth.js";
+
+function DashboardRouter() {
+  const { user } = useAuth();
+  if (user?.role === "ADMIN") return <AdminDashboard />;
+  if (user?.role === "INSTRUCTOR") return <InstructorDashboard />;
+  return <StudentDashboard />;
+}
 
 export default function App() {
   return (
@@ -24,7 +32,7 @@ export default function App() {
           path="/dashboard"
           element={
             <ProtectedRoute roles={["STUDENT", "INSTRUCTOR", "ADMIN"]}>
-              <StudentDashboard />
+              <DashboardRouter />
             </ProtectedRoute>
           }
         />

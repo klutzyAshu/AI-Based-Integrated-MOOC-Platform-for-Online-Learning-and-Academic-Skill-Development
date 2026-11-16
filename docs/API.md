@@ -10,7 +10,7 @@ header, obtained from `/auth/login` or `/auth/register`.
 ## Auth
 
 ### POST /auth/register
-Public. Creates a new user and returns a JWT.
+Public. Creates a student account and returns a JWT. Public registration always assigns the `STUDENT` role; elevated roles must be assigned by an administrator.
 ```json
 // Request
 { "name": "Sam Student", "email": "sam@example.com", "password": "Password123", "role": "STUDENT" }

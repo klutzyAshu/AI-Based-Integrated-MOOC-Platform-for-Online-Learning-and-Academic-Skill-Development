@@ -1,6 +1,5 @@
 package com.mooc.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +37,6 @@ public class Quiz {
     private boolean aiGenerated = false;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @Builder.Default
     private List<Question> questions = new ArrayList<>();
 }

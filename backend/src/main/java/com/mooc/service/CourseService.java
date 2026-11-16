@@ -21,12 +21,15 @@ public class CourseService {
         return courseRepository.findByPublishedTrue();
     }
 
-    public List<Course> findByInstructor(Long instructorId) {
+    public List<Course> findByInstructor(Long instructorId, User requester) {
+        if (requester.getRole() != User.Role.ADMIN && !requester.getId().equals(instructorId)) {
+            throw new org.springframework.security.access.AccessDeniedException("You can only view your own courses");
+        }
         return courseRepository.findByInstructorId(instructorId);
     }
 
     public List<Course> search(String keyword) {
-        return courseRepository.findByTitleContainingIgnoreCase(keyword);
+        return courseRepository.findByPublishedTrueAndTitleContainingIgnoreCase(keyword);
     }
 
     public Course findById(Long id) {
@@ -52,8 +55,9 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public Course update(Long id, CourseRequest request) {
+    public Course update(Long id, CourseRequest request, User requester) {
         Course course = findById(id);
+        assertCanManage(course, requester);
         if (request.getTitle() != null) course.setTitle(request.getTitle());
         if (request.getDescription() != null) course.setDescription(request.getDescription());
         if (request.getLevel() != null) course.setLevel(request.getLevel());
@@ -61,13 +65,23 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public void delete(Long id) {
-        courseRepository.deleteById(id);
+    public void delete(Long id, User requester) {
+        Course course = findById(id);
+        assertCanManage(course, requester);
+        courseRepository.delete(course);
     }
 
-    public Course publish(Long id) {
+    public Course publish(Long id, User requester) {
         Course course = findById(id);
+        assertCanManage(course, requester);
         course.setPublished(true);
         return courseRepository.save(course);
+    }
+
+    private void assertCanManage(Course course, User requester) {
+        if (requester.getRole() != User.Role.ADMIN
+                && (course.getInstructor() == null || !course.getInstructor().getId().equals(requester.getId()))) {
+            throw new org.springframework.security.access.AccessDeniedException("You can only manage your own courses");
+        }
     }
 }

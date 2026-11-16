@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -33,7 +34,15 @@ public class EnrollmentController {
     }
 
     @GetMapping("/course/{courseId}")
-    public ResponseEntity<List<Enrollment>> byCourse(@PathVariable Long courseId) {
+    @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
+    public ResponseEntity<List<Enrollment>> byCourse(@PathVariable Long courseId,
+                                                       @AuthenticationPrincipal AppUserPrincipal principal) {
+        var course = courseService.findById(courseId);
+        var user = principal.getUser();
+        if (user.getRole() != com.mooc.model.User.Role.ADMIN
+                && (course.getInstructor() == null || !course.getInstructor().getId().equals(user.getId()))) {
+            throw new org.springframework.security.access.AccessDeniedException("You can only view enrollments in your courses");
+        }
         return ResponseEntity.ok(enrollmentService.findByCourse(courseId));
     }
 

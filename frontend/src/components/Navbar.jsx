@@ -11,48 +11,27 @@ export default function Navbar() {
   };
 
   return (
-    <nav style={styles.nav}>
-      <Link to="/dashboard" style={styles.brand}>
-        MOOC Platform
+    <nav className="topbar">
+      <Link to="/dashboard" className="brand">
+        <span className="brand-mark">L</span> Learnspace
       </Link>
-      <div style={styles.links}>
-        <Link to="/dashboard" style={styles.link}>Dashboard</Link>
+      <div className="nav-links">
+        <Link to="/dashboard" className="nav-link">Dashboard</Link>
         {user && (user.role === "INSTRUCTOR" || user.role === "ADMIN") && (
-          <Link to="/instructor" style={styles.link}>Instructor</Link>
+          <Link to="/instructor" className="nav-link">Instructor</Link>
         )}
         {user && user.role === "ADMIN" && (
-          <Link to="/admin" style={styles.link}>Admin</Link>
+          <Link to="/admin" className="nav-link">Admin</Link>
         )}
         {user ? (
-          <button onClick={handleLogout} style={styles.button}>
-            Logout ({user.name})
+          <button onClick={handleLogout} className="button button-quiet">
+            {user.name} <span aria-hidden="true"> · Sign out</span>
           </button>
         ) : (
-          <Link to="/login" style={styles.link}>Login</Link>
+          <Link to="/login" className="nav-link">Sign in</Link>
         )}
       </div>
     </nav>
   );
 }
 
-const styles = {
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "12px 24px",
-    background: "#121212",
-    color: "#fff",
-  },
-  brand: { color: "#fff", fontWeight: "bold", textDecoration: "none", fontSize: 18 },
-  links: { display: "flex", gap: 16, alignItems: "center" },
-  link: { color: "#fff", textDecoration: "none" },
-  button: {
-    background: "transparent",
-    border: "1px solid #fff",
-    color: "#fff",
-    borderRadius: 6,
-    padding: "6px 12px",
-    cursor: "pointer",
-  },
-};

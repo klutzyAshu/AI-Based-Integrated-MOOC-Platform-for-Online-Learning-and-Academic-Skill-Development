@@ -4,9 +4,9 @@
 -- ============================================================
 
 INSERT INTO users (name, email, password, role) VALUES
-('Ashu Admin', 'admin@mooc.dev', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN'),
-('Ivy Instructor', 'instructor@mooc.dev', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'INSTRUCTOR'),
-('Sam Student', 'student@mooc.dev', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'STUDENT');
+('Ashu Admin', 'admin@mooc.dev', '$2a$10$f4kjUmUo1ndd0z49r4tijOw7pm3RLEP2QjvuEdvQjOeHuY.F80nbG', 'ADMIN'),
+('Ivy Instructor', 'instructor@mooc.dev', '$2a$10$f4kjUmUo1ndd0z49r4tijOw7pm3RLEP2QjvuEdvQjOeHuY.F80nbG', 'INSTRUCTOR'),
+('Sam Student', 'student@mooc.dev', '$2a$10$f4kjUmUo1ndd0z49r4tijOw7pm3RLEP2QjvuEdvQjOeHuY.F80nbG', 'STUDENT');
 
 INSERT INTO categories (name, description) VALUES
 ('Computer Science', 'Programming, algorithms, and software engineering'),

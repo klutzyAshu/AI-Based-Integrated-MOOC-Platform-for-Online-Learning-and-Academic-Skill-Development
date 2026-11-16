@@ -27,6 +27,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("No user found with email: " + email));
+        if (!user.isActive()) {
+            throw new UsernameNotFoundException("Account is inactive");
+        }
         return new AppUserPrincipal(user);
     }
 

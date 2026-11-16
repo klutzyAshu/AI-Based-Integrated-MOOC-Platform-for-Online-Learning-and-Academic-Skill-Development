@@ -6,6 +6,8 @@ export default function Dashboard() {
   const [courses, setCourses] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionError, setActionError] = useState("");
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -16,6 +18,8 @@ export default function Dashboard() {
         ]);
         setCourses(allCourses);
         setEnrollments(myCourses);
+      } catch {
+        setLoadError("We couldn’t load the course catalog. Please refresh to try again.");
       } finally {
         setLoading(false);
       }
@@ -23,42 +27,45 @@ export default function Dashboard() {
   }, []);
 
   const handleEnroll = async (courseId) => {
-    await enroll(courseId);
-    const updated = await myEnrollments();
-    setEnrollments(updated);
+    setActionError("");
+    try {
+      await enroll(courseId);
+      const updated = await myEnrollments();
+      setEnrollments(updated);
+    } catch (error) {
+      setActionError(error.response?.data?.error || "We couldn’t enroll you. Please try again.");
+    }
   };
 
   if (loading) return <p>Loading courses…</p>;
 
   return (
     <div>
-      <h2>Explore Courses</h2>
-      <div style={styles.grid}>
+      <div className="page-heading"><div><span className="eyebrow">YOUR LEARNING SPACE</span><h2>Explore courses</h2><p>Find a course and keep building your skills.</p></div></div>
+      {loadError && <p className="auth-error" role="alert">{loadError}</p>}
+      {actionError && <p className="auth-error" role="alert">{actionError}</p>}
+      <div className="course-grid">
         {courses.map((course) => (
-          <div key={course.id}>
+          <div className="course-tile" key={course.id}>
             <CourseCard course={course} />
-            <button style={styles.enrollBtn} onClick={() => handleEnroll(course.id)}>
-              Enroll
+            <button className="button-primary" disabled={enrollments.some((e) => e.course?.id === course.id && e.status !== "DROPPED")} onClick={() => handleEnroll(course.id)}>
+              {enrollments.some((e) => e.course?.id === course.id && e.status !== "DROPPED") ? "Enrolled" : "Enroll"}
             </button>
           </div>
         ))}
-        {courses.length === 0 && <p>No published courses yet.</p>}
+        {courses.length === 0 && <div className="empty-state">No published courses yet. Check back soon.</div>}
       </div>
 
-      <h2 style={{ marginTop: 40 }}>My Enrollments</h2>
-      <ul>
+      <h2 className="section-title">My enrollments</h2>
+      <ul className="enrollment-list">
         {enrollments.map((e) => (
           <li key={e.id}>
             {e.course?.title} — {e.status}
           </li>
         ))}
-        {enrollments.length === 0 && <p>You haven't enrolled in any course yet.</p>}
+        {enrollments.length === 0 && <li className="muted">You haven’t enrolled in a course yet.</li>}
       </ul>
     </div>
   );
 }
 
-const styles = {
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 },
-  enrollBtn: { marginTop: 8, padding: "6px 12px", borderRadius: 6, border: "none", background: "#121212", color: "#fff", cursor: "pointer" },
-};

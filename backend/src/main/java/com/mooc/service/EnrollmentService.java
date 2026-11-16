@@ -18,8 +18,21 @@ public class EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
 
     public Enrollment enroll(User user, Course course) {
-        if (enrollmentRepository.existsByUserIdAndCourseId(user.getId(), course.getId())) {
+        if (user.getRole() != User.Role.STUDENT) {
+            throw new org.springframework.security.access.AccessDeniedException("Only students can enroll in courses");
+        }
+        if (!course.isPublished()) {
+            throw new IllegalArgumentException("This course is not available for enrollment");
+        }
+        var existing = enrollmentRepository.findByUserIdAndCourseId(user.getId(), course.getId());
+        if (existing.isPresent() && existing.get().getStatus() != Enrollment.Status.DROPPED) {
             throw new IllegalArgumentException("Already enrolled in this course");
+        }
+        if (existing.isPresent()) {
+            Enrollment enrollment = existing.get();
+            enrollment.setStatus(Enrollment.Status.ACTIVE);
+            enrollment.setCompletedAt(null);
+            return enrollmentRepository.save(enrollment);
         }
         Enrollment enrollment = Enrollment.builder()
                 .user(user)

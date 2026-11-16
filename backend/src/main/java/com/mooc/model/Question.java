@@ -1,5 +1,7 @@
 package com.mooc.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +22,7 @@ public class Question {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id", nullable = false)
+    @JsonIgnore
     private Quiz quiz;
 
     @Column(nullable = false, length = 500)
@@ -31,6 +34,7 @@ public class Question {
     private String optionsJson;
 
     @Column(name = "correct_index", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer correctIndex;
 
     @Column(length = 500)

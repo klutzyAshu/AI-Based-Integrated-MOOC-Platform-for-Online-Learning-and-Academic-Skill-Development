@@ -31,7 +31,8 @@ public class AuthService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole() != null ? request.getRole() : User.Role.STUDENT)
+                // Public registration must never grant privileged roles.
+                .role(User.Role.STUDENT)
                 .build();
 
         userRepository.save(user);

@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByPublishedTrue();
+    List<Course> findByPublishedTrueAndTitleContainingIgnoreCase(String keyword);
     List<Course> findByInstructorId(Long instructorId);
     List<Course> findByTitleContainingIgnoreCase(String keyword);
 }

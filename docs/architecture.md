@@ -73,8 +73,9 @@ MariaDB (MySQL-compatible) database. Each layer is independently deployable.
 ## Key Design Decisions
 
 - **Stateless auth (JWT)** so the backend can scale horizontally.
-- **DTOs at the API boundary** keep JPA entities from leaking
-  persistence details into the REST contract.
+- Request DTOs validate auth, course, quiz, and AI inputs. Some read
+  endpoints still serialize JPA entities directly; sensitive fields such
+  as password hashes and quiz correct answers are excluded from responses.
 - **AI layer isolated behind one controller/service** so the provider
   (or a self-hosted model) can be swapped without touching frontend code.
 - **Role-based route protection** on both the frontend (`ProtectedRoute`)

@@ -12,6 +12,7 @@ set -e
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DB_DIR="$ROOT_DIR/database"
+cd "$ROOT_DIR"
 
 DB_USER="${DB_USERNAME:-root}"
 DB_PASS="${DB_PASSWORD:-root}"
@@ -26,10 +27,10 @@ echo "== Applying schema (using '$CLIENT' client) =="
 
 for f in users courses enrollments quizzes ai; do
   echo "-- Loading schema/$f.sql --"
-  "$CLIENT" -u "$DB_USER" -p"$DB_PASS" mooc_platform < "$DB_DIR/schema/$f.sql" 2>/dev/null || true
+  "$CLIENT" -u "$DB_USER" -p"$DB_PASS" mooc_platform < "$DB_DIR/schema/$f.sql"
 done
 
-if [ "$1" == "--with-sample-data" ]; then
+if [ "${1:-}" == "--with-sample-data" ]; then
   echo "== Loading sample data =="
   "$CLIENT" -u "$DB_USER" -p"$DB_PASS" mooc_platform < "$DB_DIR/seed/sample_data.sql"
   echo "Sample accounts (password: Password123):"

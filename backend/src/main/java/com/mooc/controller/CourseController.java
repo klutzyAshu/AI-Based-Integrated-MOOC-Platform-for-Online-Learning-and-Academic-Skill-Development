@@ -30,8 +30,15 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> byId(@PathVariable Long id) {
-        return ResponseEntity.ok(courseService.findById(id));
+    public ResponseEntity<Course> byId(@PathVariable Long id,
+                                       @AuthenticationPrincipal AppUserPrincipal principal) {
+        Course course = courseService.findById(id);
+        var user = principal.getUser();
+        if (!course.isPublished() && user.getRole() != com.mooc.model.User.Role.ADMIN
+                && (course.getInstructor() == null || !course.getInstructor().getId().equals(user.getId()))) {
+            throw new org.springframework.security.access.AccessDeniedException("This course is not published");
+        }
+        return ResponseEntity.ok(course);
     }
 
     @PostMapping
@@ -43,26 +50,30 @@ public class CourseController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
-    public ResponseEntity<Course> update(@PathVariable Long id, @RequestBody CourseRequest request) {
-        return ResponseEntity.ok(courseService.update(id, request));
+    public ResponseEntity<Course> update(@PathVariable Long id, @RequestBody CourseRequest request,
+                                         @AuthenticationPrincipal AppUserPrincipal principal) {
+        return ResponseEntity.ok(courseService.update(id, request, principal.getUser()));
     }
 
     @PatchMapping("/{id}/publish")
     @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
-    public ResponseEntity<Course> publish(@PathVariable Long id) {
-        return ResponseEntity.ok(courseService.publish(id));
+    public ResponseEntity<Course> publish(@PathVariable Long id,
+                                           @AuthenticationPrincipal AppUserPrincipal principal) {
+        return ResponseEntity.ok(courseService.publish(id, principal.getUser()));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        courseService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id,
+                                       @AuthenticationPrincipal AppUserPrincipal principal) {
+        courseService.delete(id, principal.getUser());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/instructor/{instructorId}")
     @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
-    public ResponseEntity<List<Course>> byInstructor(@PathVariable Long instructorId) {
-        return ResponseEntity.ok(courseService.findByInstructor(instructorId));
+    public ResponseEntity<List<Course>> byInstructor(@PathVariable Long instructorId,
+                                                       @AuthenticationPrincipal AppUserPrincipal principal) {
+        return ResponseEntity.ok(courseService.findByInstructor(instructorId, principal.getUser()));
     }
 }
