@@ -22,7 +22,7 @@ export default function Login() {
 
   return (
     <div className="auth-shell">
-      <aside className="auth-aside"><div><span className="eyebrow" style={{ color: "#b7d9c7" }}>LEARN AT YOUR PACE</span><h2>Small steps. Big progress.</h2><p>A focused space to discover courses, practice new skills, and make learning part of your routine.</p></div><span>Learnspace · Online learning</span></aside>
+      <aside className="auth-aside"><div><span className="eyebrow" style={{ color: "#b7d9c7" }}>LEARN AT YOUR PACE</span><h2>Small steps. Big progress.</h2><p>A focused space to discover courses, practice new skills, and make learning part of your routine.</p></div><span>Neolce · Online learning</span></aside>
       <div className="auth-form-wrap"><form onSubmit={handleSubmit} className="auth-form">
         <h2>Welcome back</h2><p>Sign in to continue learning.</p>
         {error && <p className="auth-error" role="alert">{error}</p>}
@@ -43,7 +43,7 @@ export default function Login() {
           required
         />
         <button type="submit">Sign in</button>
-        <p className="auth-footer">New to Learnspace? <Link to="/register">Create an account</Link></p>
+        <p className="auth-footer">New to Neolce? <Link to="/register">Create an account</Link></p>
       </form></div>
     </div>
   );

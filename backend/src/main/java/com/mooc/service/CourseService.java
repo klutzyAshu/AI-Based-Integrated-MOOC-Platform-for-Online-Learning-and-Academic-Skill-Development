@@ -6,16 +6,18 @@ import com.mooc.model.Category;
 import com.mooc.model.Course;
 import com.mooc.model.User;
 import com.mooc.repository.CourseRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class CourseService {
 
     private final CourseRepository courseRepository;
+
+    public CourseService(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
+    }
 
     public List<Course> findAllPublished() {
         return courseRepository.findByPublishedTrue();

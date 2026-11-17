@@ -7,20 +7,26 @@ import com.mooc.model.User;
 import com.mooc.repository.UserRepository;
 import com.mooc.security.CustomUserDetailsService;
 import com.mooc.security.JwtService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       JwtService jwtService, AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+    }
 
     public LoginResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {

@@ -4,16 +4,18 @@ import com.mooc.exception.ResourceNotFoundException;
 import com.mooc.model.CourseModule;
 import com.mooc.model.Lesson;
 import com.mooc.repository.LessonRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class LessonService {
 
     private final LessonRepository lessonRepository;
+
+    public LessonService(LessonRepository lessonRepository) {
+        this.lessonRepository = lessonRepository;
+    }
 
     public List<Lesson> findByModule(Long moduleId) {
         return lessonRepository.findByModuleIdOrderByOrderAsc(moduleId);

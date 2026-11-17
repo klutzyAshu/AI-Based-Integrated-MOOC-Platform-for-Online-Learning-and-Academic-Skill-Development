@@ -5,17 +5,19 @@ import com.mooc.model.Course;
 import com.mooc.model.Enrollment;
 import com.mooc.model.User;
 import com.mooc.repository.EnrollmentRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class EnrollmentService {
 
     private final EnrollmentRepository enrollmentRepository;
+
+    public EnrollmentService(EnrollmentRepository enrollmentRepository) {
+        this.enrollmentRepository = enrollmentRepository;
+    }
 
     public Enrollment enroll(User user, Course course) {
         if (user.getRole() != User.Role.STUDENT) {

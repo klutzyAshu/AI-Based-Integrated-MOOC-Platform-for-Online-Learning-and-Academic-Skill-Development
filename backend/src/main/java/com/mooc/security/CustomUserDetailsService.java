@@ -2,7 +2,6 @@ package com.mooc.security;
 
 import com.mooc.model.User;
 import com.mooc.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,10 +17,13 @@ import java.util.List;
  * and exposes it as the UserDetailsService used by the JWT filter.
  */
 @Service
-@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

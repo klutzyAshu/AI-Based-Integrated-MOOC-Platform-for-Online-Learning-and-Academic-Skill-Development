@@ -1,25 +1,28 @@
 package com.mooc.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mooc.dto.QuizRequest;
 import com.mooc.exception.ResourceNotFoundException;
 import com.mooc.model.*;
-import com.mooc.repository.QuizRepository;
 import com.mooc.repository.QuizAttemptRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import com.mooc.repository.QuizRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class QuizService {
 
     private final QuizRepository quizRepository;
     private final QuizAttemptRepository quizAttemptRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public QuizService(QuizRepository quizRepository, QuizAttemptRepository quizAttemptRepository) {
+        this.quizRepository = quizRepository;
+        this.quizAttemptRepository = quizAttemptRepository;
+    }
 
     public Quiz findById(Long id) {
         return quizRepository.findById(id)
@@ -30,7 +33,6 @@ public class QuizService {
         return quizRepository.findByLessonId(lessonId);
     }
 
-    @SneakyThrows
     public Quiz create(QuizRequest request) {
         Quiz quiz = Quiz.builder()
                 .title(request.getTitle())
@@ -46,10 +48,16 @@ public class QuizService {
         List<Question> questions = new ArrayList<>();
         if (request.getQuestions() != null) {
             for (QuizRequest.QuestionItem item : request.getQuestions()) {
+                String optionsJson;
+                try {
+                    optionsJson = objectMapper.writeValueAsString(item.getOptions());
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException("Failed to serialize options to JSON", e);
+                }
                 Question q = Question.builder()
                         .quiz(quiz)
                         .text(item.getText())
-                        .optionsJson(objectMapper.writeValueAsString(item.getOptions()))
+                        .optionsJson(optionsJson)
                         .correctIndex(item.getCorrectIndex())
                         .explanation(item.getExplanation())
                         .build();
@@ -98,8 +106,11 @@ public class QuizService {
         return quizAttemptRepository.save(attempt);
     }
 
-    @SneakyThrows
     private String writeAnswers(List<Integer> answers) {
-        return objectMapper.writeValueAsString(answers);
+        try {
+            return objectMapper.writeValueAsString(answers);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize answers to JSON", e);
+        }
     }
 }

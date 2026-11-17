@@ -3,7 +3,6 @@ package com.mooc.service;
 import com.mooc.config.AIConfig;
 import com.mooc.dto.AIRequest;
 import com.mooc.dto.AIResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,11 +18,15 @@ import java.util.Map;
  * API key is configured, so the rest of the app still runs in dev.
  */
 @Service
-@RequiredArgsConstructor
 public class AIService {
 
     private final AIConfig aiConfig;
     private final RestTemplate aiRestTemplate;
+
+    public AIService(AIConfig aiConfig, RestTemplate aiRestTemplate) {
+        this.aiConfig = aiConfig;
+        this.aiRestTemplate = aiRestTemplate;
+    }
 
     public AIResponse handle(AIRequest request) {
         return switch (request.getType().toUpperCase()) {

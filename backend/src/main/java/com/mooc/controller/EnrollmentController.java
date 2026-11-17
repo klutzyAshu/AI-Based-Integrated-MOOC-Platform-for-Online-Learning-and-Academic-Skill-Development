@@ -5,7 +5,6 @@ import com.mooc.model.Enrollment;
 import com.mooc.security.CustomUserDetailsService.AppUserPrincipal;
 import com.mooc.service.CourseService;
 import com.mooc.service.EnrollmentService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +14,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/enrollments")
-@RequiredArgsConstructor
 public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
     private final CourseService courseService;
+
+    public EnrollmentController(EnrollmentService enrollmentService, CourseService courseService) {
+        this.enrollmentService = enrollmentService;
+        this.courseService = courseService;
+    }
 
     @PostMapping("/{courseId}")
     public ResponseEntity<Enrollment> enroll(@PathVariable Long courseId,

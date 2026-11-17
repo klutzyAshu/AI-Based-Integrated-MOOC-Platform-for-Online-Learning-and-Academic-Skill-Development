@@ -4,7 +4,6 @@ import com.mooc.dto.CourseRequest;
 import com.mooc.model.Course;
 import com.mooc.security.CustomUserDetailsService.AppUserPrincipal;
 import com.mooc.service.CourseService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,10 +13,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/courses")
-@RequiredArgsConstructor
 public class CourseController {
 
     private final CourseService courseService;
+
+    public CourseController(CourseService courseService) {
+        this.courseService = courseService;
+    }
 
     @GetMapping("/public")
     public ResponseEntity<List<Course>> publicCatalog() {

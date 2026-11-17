@@ -1,6 +1,6 @@
-# Learnspace
+# Neolce
 
-Learnspace is a role-based online learning platform built with React, Spring Boot, and MariaDB. Learners can browse courses, enroll, and ask an AI assistant for help. Instructors can create and publish courses, while administrators manage users.
+Neolce is a role-based online learning platform built with React, Spring Boot, and MariaDB. Learners can browse courses, enroll, and ask an AI assistant for help. Instructors can create and publish courses, while administrators manage users.
 
 ## Features
 

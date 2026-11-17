@@ -2,7 +2,6 @@ package com.mooc.controller;
 
 import com.mooc.model.Lesson;
 import com.mooc.service.LessonService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +10,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/lessons")
-@RequiredArgsConstructor
 public class LessonController {
 
     private final LessonService lessonService;
+
+    public LessonController(LessonService lessonService) {
+        this.lessonService = lessonService;
+    }
 
     @GetMapping("/module/{moduleId}")
     public ResponseEntity<List<Lesson>> byModule(@PathVariable Long moduleId) {

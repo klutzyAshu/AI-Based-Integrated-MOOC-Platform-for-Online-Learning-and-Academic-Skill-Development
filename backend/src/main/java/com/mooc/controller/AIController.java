@@ -4,7 +4,6 @@ import com.mooc.dto.AIRequest;
 import com.mooc.dto.AIResponse;
 import com.mooc.service.AIService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,10 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/ai")
-@RequiredArgsConstructor
 public class AIController {
 
     private final AIService aiService;
+
+    public AIController(AIService aiService) {
+        this.aiService = aiService;
+    }
 
     @PostMapping("/ask")
     public ResponseEntity<AIResponse> ask(@Valid @RequestBody AIRequest request) {

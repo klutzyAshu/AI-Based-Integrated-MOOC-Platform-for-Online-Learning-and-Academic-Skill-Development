@@ -1,9 +1,6 @@
 package com.mooc.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Generic envelope for calls into the AI layer (chatbot, recommendation,
@@ -11,9 +8,6 @@ import lombok.NoArgsConstructor;
  * handles the request; `context` carries free-form JSON (course id,
  * current lesson, prior scores, etc.) the service needs.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class AIRequest {
 
     @NotBlank
@@ -23,4 +17,37 @@ public class AIRequest {
     private String prompt;
 
     private String contextJson;
+
+    public AIRequest() {
+    }
+
+    public AIRequest(String type, String prompt, String contextJson) {
+        this.type = type;
+        this.prompt = prompt;
+        this.contextJson = contextJson;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getPrompt() {
+        return prompt;
+    }
+
+    public void setPrompt(String prompt) {
+        this.prompt = prompt;
+    }
+
+    public String getContextJson() {
+        return contextJson;
+    }
+
+    public void setContextJson(String contextJson) {
+        this.contextJson = contextJson;
+    }
 }

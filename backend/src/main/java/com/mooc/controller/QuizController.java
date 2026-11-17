@@ -4,7 +4,6 @@ import com.mooc.dto.QuizRequest;
 import com.mooc.model.Quiz;
 import com.mooc.security.CustomUserDetailsService.AppUserPrincipal;
 import com.mooc.service.QuizService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,10 +14,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quizzes")
-@RequiredArgsConstructor
 public class QuizController {
 
     private final QuizService quizService;
+
+    public QuizController(QuizService quizService) {
+        this.quizService = quizService;
+    }
     @GetMapping("/lesson/{lessonId}")
     public ResponseEntity<List<Quiz>> byLesson(@PathVariable Long lessonId) {
         return ResponseEntity.ok(quizService.findByLesson(lessonId));
