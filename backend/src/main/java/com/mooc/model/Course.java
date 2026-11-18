@@ -35,6 +35,7 @@ public class Course {
     private boolean published = false;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("order ASC")
     private List<CourseModule> modules = new ArrayList<>();
 
     @Column(updatable = false)

@@ -10,4 +10,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByPublishedTrueAndTitleContainingIgnoreCase(String keyword);
     List<Course> findByInstructorId(Long instructorId);
     List<Course> findByTitleContainingIgnoreCase(String keyword);
+    long countByPublishedTrue();
+    List<Course> findByInstructorIdOrderByCreatedAtDesc(Long instructorId);
 }

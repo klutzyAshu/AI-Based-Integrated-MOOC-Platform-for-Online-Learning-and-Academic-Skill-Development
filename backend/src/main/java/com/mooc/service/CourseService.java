@@ -6,7 +6,9 @@ import com.mooc.model.Category;
 import com.mooc.model.Course;
 import com.mooc.model.User;
 import com.mooc.repository.CourseRepository;
+import com.mooc.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,9 +16,11 @@ import java.util.List;
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final CategoryRepository categoryRepository;
 
-    public CourseService(CourseRepository courseRepository) {
+    public CourseService(CourseRepository courseRepository, CategoryRepository categoryRepository) {
         this.courseRepository = courseRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public List<Course> findAllPublished() {
@@ -40,6 +44,9 @@ public class CourseService {
     }
 
     public Course create(CourseRequest request, User instructor) {
+        if (Boolean.TRUE.equals(request.getPublished())) {
+            throw new IllegalArgumentException("Create the course outline before publishing it");
+        }
         Course course = Course.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -49,20 +56,25 @@ public class CourseService {
                 .build();
 
         if (request.getCategoryId() != null) {
-            Category category = new Category();
-            category.setId(request.getCategoryId());
-            course.setCategory(category);
+            course.setCategory(categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> ResourceNotFoundException.of("Category", request.getCategoryId())));
         }
 
         return courseRepository.save(course);
     }
 
+    @Transactional
     public Course update(Long id, CourseRequest request, User requester) {
         Course course = findById(id);
         assertCanManage(course, requester);
         if (request.getTitle() != null) course.setTitle(request.getTitle());
         if (request.getDescription() != null) course.setDescription(request.getDescription());
         if (request.getLevel() != null) course.setLevel(request.getLevel());
+        if (request.getCategoryId() != null) {
+            course.setCategory(categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> ResourceNotFoundException.of("Category", request.getCategoryId())));
+        }
+        if (Boolean.TRUE.equals(request.getPublished())) assertPublishable(course);
         if (request.getPublished() != null) course.setPublished(request.getPublished());
         return courseRepository.save(course);
     }
@@ -73,11 +85,19 @@ public class CourseService {
         courseRepository.delete(course);
     }
 
+    @Transactional
     public Course publish(Long id, User requester) {
         Course course = findById(id);
         assertCanManage(course, requester);
+        assertPublishable(course);
         course.setPublished(true);
         return courseRepository.save(course);
+    }
+
+    private void assertPublishable(Course course) {
+        if (course.getModules().isEmpty() || course.getModules().stream().allMatch(module -> module.getLessons().isEmpty())) {
+            throw new IllegalArgumentException("Add at least one module and lesson before publishing this course");
+        }
     }
 
     private void assertCanManage(Course course, User requester) {

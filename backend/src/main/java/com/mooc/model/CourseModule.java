@@ -30,6 +30,7 @@ public class CourseModule {
     private Integer order = 0;
 
     @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("order ASC")
     private List<Lesson> lessons = new ArrayList<>();
 
     public CourseModule() {

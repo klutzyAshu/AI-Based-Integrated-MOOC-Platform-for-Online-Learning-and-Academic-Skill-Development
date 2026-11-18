@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import CourseCard from "../../components/CourseCard.jsx";
 import { getPublicCourses, myEnrollments, enroll } from "../../services/courseService.js";
 
@@ -60,7 +61,10 @@ export default function Dashboard() {
       <ul className="enrollment-list">
         {enrollments.map((e) => (
           <li key={e.id}>
-            {e.course?.title} — {e.status}
+            <div className="enrollment-row">
+              <div><Link to={`/courses/${e.course?.id}`}>{e.course?.title}</Link><span className="muted">{e.status === "COMPLETED" ? "Completed" : "In progress"}</span></div>
+              {e.status === "COMPLETED" && <Link className="text-link" to={`/certificates/${e.course?.id}`}>View certificate ↗</Link>}
+            </div>
           </li>
         ))}
         {enrollments.length === 0 && <li className="muted">You haven’t enrolled in a course yet.</li>}

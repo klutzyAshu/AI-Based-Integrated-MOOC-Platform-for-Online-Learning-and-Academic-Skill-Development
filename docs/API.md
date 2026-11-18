@@ -38,6 +38,15 @@ Public.
 | PATCH | /users/{id}/role?role=INSTRUCTOR | ADMIN | Change a user's role |
 | DELETE | /users/{id} | ADMIN | Deactivate a user |
 
+## Categories
+
+| Method | Path | Access | Description |
+|---|---|---|---|
+| GET | /categories | Authenticated | List course categories |
+| POST | /categories | ADMIN | Create a category |
+| PUT | /categories/{id} | ADMIN | Rename or update a category |
+| DELETE | /categories/{id} | ADMIN | Delete a category (assigned courses become uncategorized) |
+
 ---
 
 ## Courses
@@ -52,6 +61,10 @@ Public.
 | PATCH | /courses/{id}/publish | INSTRUCTOR/ADMIN | Publish a course |
 | DELETE | /courses/{id} | INSTRUCTOR/ADMIN | Delete a course |
 | GET | /courses/instructor/{instructorId} | INSTRUCTOR/ADMIN | Courses by instructor |
+| GET | /courses/{courseId}/modules | Authenticated | List course modules |
+| POST | /courses/{courseId}/modules | INSTRUCTOR/ADMIN | Add a module (course owner or admin) |
+| PUT | /modules/{moduleId} | INSTRUCTOR/ADMIN | Rename or reorder a module |
+| DELETE | /modules/{moduleId} | INSTRUCTOR/ADMIN | Delete a module and its lessons |
 
 `CourseRequest` body:
 ```json
@@ -66,8 +79,8 @@ Public.
 |---|---|---|---|
 | GET | /lessons/module/{moduleId} | Authenticated | Lessons in a module, ordered |
 | GET | /lessons/{id} | Authenticated | Get a lesson |
-| POST | /lessons | INSTRUCTOR/ADMIN | Create a lesson (query params: moduleId, title, content, videoUrl, order) |
-| PUT | /lessons/{id} | INSTRUCTOR/ADMIN | Update a lesson |
+| POST | /lessons | INSTRUCTOR/ADMIN | Create a lesson (JSON body: moduleId, title, content, videoUrl, order) |
+| PUT | /lessons/{id} | INSTRUCTOR/ADMIN | Update a lesson (JSON body) |
 | DELETE | /lessons/{id} | INSTRUCTOR/ADMIN | Delete a lesson |
 
 ---
@@ -109,6 +122,25 @@ Submit body: a JSON array of selected option indices, in question order:
 | GET | /enrollments/course/{courseId} | Authenticated | Enrollments for a course (instructor view) |
 | PATCH | /enrollments/{courseId}/complete | Authenticated | Mark a course completed |
 | DELETE | /enrollments/{courseId} | Authenticated | Drop a course |
+
+## Progress and Certificates
+
+| Method | Path | Access | Description |
+|---|---|---|---|
+| GET | /progress/courses/{courseId} | Enrolled learner | Read completion percentage and completed lesson IDs |
+| POST | /progress/courses/{courseId}/lessons/{lessonId}/visit | Enrolled learner | Save the most recently visited lesson for resume |
+| POST | /progress/courses/{courseId}/lessons/{lessonId}/complete | Enrolled learner | Mark a lesson complete; completion of all lessons completes enrollment and issues a certificate |
+| GET | /certificates/me | Authenticated | List your certificates |
+| GET | /certificates/me/courses/{courseId} | Authenticated | Get your certificate for a completed course |
+
+The certificate response includes the learner, course, issue date, and unique code. The frontend provides a print view that can be saved as a PDF.
+
+## Analytics
+
+| Method | Path | Access | Description |
+|---|---|---|---|
+| GET | /analytics/overview | ADMIN | Platform totals for users, courses, enrollments, completions, and certificates |
+| GET | /analytics/my-courses | INSTRUCTOR/ADMIN | Per-course enrollment and completion counts for the current account |
 
 ---
 

@@ -13,7 +13,7 @@ export default function Navbar() {
   return (
     <nav className="topbar">
       <Link to="/dashboard" className="brand">
-        <span className="brand-mark">L</span> Neolce
+        <span className="brand-mark">N</span> Neolce
       </Link>
       <div className="nav-links">
         <Link to="/dashboard" className="nav-link">Dashboard</Link>

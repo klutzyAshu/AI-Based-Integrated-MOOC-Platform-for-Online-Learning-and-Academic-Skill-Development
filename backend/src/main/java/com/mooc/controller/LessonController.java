@@ -1,10 +1,14 @@
 package com.mooc.controller;
 
 import com.mooc.model.Lesson;
+import com.mooc.dto.LessonRequest;
+import com.mooc.security.CustomUserDetailsService.AppUserPrincipal;
 import com.mooc.service.LessonService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -19,38 +23,36 @@ public class LessonController {
     }
 
     @GetMapping("/module/{moduleId}")
-    public ResponseEntity<List<Lesson>> byModule(@PathVariable Long moduleId) {
-        return ResponseEntity.ok(lessonService.findByModule(moduleId));
+    public ResponseEntity<List<Lesson>> byModule(@PathVariable Long moduleId,
+                                                  @AuthenticationPrincipal AppUserPrincipal principal) {
+        return ResponseEntity.ok(lessonService.findByModule(moduleId, principal.getUser()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Lesson> byId(@PathVariable Long id) {
-        return ResponseEntity.ok(lessonService.findById(id));
+    public ResponseEntity<Lesson> byId(@PathVariable Long id,
+                                        @AuthenticationPrincipal AppUserPrincipal principal) {
+        return ResponseEntity.ok(lessonService.findById(id, principal.getUser()));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
-    public ResponseEntity<Lesson> create(@RequestParam Long moduleId,
-                                          @RequestParam String title,
-                                          @RequestParam(required = false) String content,
-                                          @RequestParam(required = false) String videoUrl,
-                                          @RequestParam(required = false) Integer order) {
-        return ResponseEntity.ok(lessonService.create(moduleId, title, content, videoUrl, order));
+    public ResponseEntity<Lesson> create(@Valid @RequestBody LessonRequest request,
+                                          @AuthenticationPrincipal AppUserPrincipal principal) {
+        return ResponseEntity.ok(lessonService.create(request.moduleId(), request.title(), request.content(),
+                request.videoUrl(), request.order(), principal.getUser()));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
-    public ResponseEntity<Lesson> update(@PathVariable Long id,
-                                          @RequestParam(required = false) String title,
-                                          @RequestParam(required = false) String content,
-                                          @RequestParam(required = false) String videoUrl) {
-        return ResponseEntity.ok(lessonService.update(id, title, content, videoUrl));
+    public ResponseEntity<Lesson> update(@PathVariable Long id, @RequestBody LessonRequest request,
+                                          @AuthenticationPrincipal AppUserPrincipal principal) {
+        return ResponseEntity.ok(lessonService.update(id, request.title(), request.content(), request.videoUrl(), principal.getUser()));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('INSTRUCTOR','ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        lessonService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal AppUserPrincipal principal) {
+        lessonService.delete(id, principal.getUser());
         return ResponseEntity.noContent().build();
     }
 }

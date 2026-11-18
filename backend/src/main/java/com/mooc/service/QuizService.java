@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class QuizService {
@@ -34,6 +35,15 @@ public class QuizService {
     }
 
     public Quiz create(QuizRequest request) {
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Quiz title is required");
+        }
+        if (request.getPassingScore() != null && (request.getPassingScore() < 0 || request.getPassingScore() > 100)) {
+            throw new IllegalArgumentException("Passing score must be between 0 and 100");
+        }
+        if (request.getQuestions() == null || request.getQuestions().isEmpty()) {
+            throw new IllegalArgumentException("Add at least one question to the quiz");
+        }
         Quiz quiz = Quiz.builder()
                 .title(request.getTitle())
                 .passingScore(request.getPassingScore() != null ? request.getPassingScore() : 60)
@@ -46,8 +56,17 @@ public class QuizService {
         }
 
         List<Question> questions = new ArrayList<>();
-        if (request.getQuestions() != null) {
-            for (QuizRequest.QuestionItem item : request.getQuestions()) {
+        for (QuizRequest.QuestionItem item : request.getQuestions()) {
+                if (item == null) throw new IllegalArgumentException("Quiz questions cannot be empty");
+                if (item.getText() == null || item.getText().isBlank()) {
+                    throw new IllegalArgumentException("Question text is required");
+                }
+                if (item.getOptions() == null || item.getOptions().size() < 2) {
+                    throw new IllegalArgumentException("Each question needs at least two answer options");
+                }
+                if (item.getCorrectIndex() == null || item.getCorrectIndex() < 0 || item.getCorrectIndex() >= item.getOptions().size()) {
+                    throw new IllegalArgumentException("The correct answer must reference an available option");
+                }
                 String optionsJson;
                 try {
                     optionsJson = objectMapper.writeValueAsString(item.getOptions());
@@ -62,7 +81,6 @@ public class QuizService {
                         .explanation(item.getExplanation())
                         .build();
                 questions.add(q);
-            }
         }
         quiz.setQuestions(questions);
 
@@ -84,10 +102,16 @@ public class QuizService {
         int correct = 0;
         for (int i = 0; i < questions.size(); i++) {
             Integer answer = answers.get(i);
-            if (answer == null || answer < 0 || answer > 3) {
-                throw new IllegalArgumentException("Answer indices must be between 0 and 3");
+            int optionCount;
+            try {
+                optionCount = objectMapper.readTree(questions.get(i).getOptionsJson()).size();
+            } catch (JsonProcessingException e) {
+                throw new IllegalStateException("Quiz question contains invalid options", e);
             }
-            if (questions.get(i).getCorrectIndex().equals(answer)) {
+            if (answer == null || answer < 0 || answer >= optionCount) {
+                throw new IllegalArgumentException("An answer is outside the available options");
+            }
+            if (Objects.equals(questions.get(i).getCorrectIndex(), answer)) {
                 correct++;
             }
         }

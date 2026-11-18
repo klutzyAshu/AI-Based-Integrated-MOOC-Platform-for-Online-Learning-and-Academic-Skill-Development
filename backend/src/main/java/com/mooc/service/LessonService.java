@@ -4,7 +4,11 @@ import com.mooc.exception.ResourceNotFoundException;
 import com.mooc.model.CourseModule;
 import com.mooc.model.Lesson;
 import com.mooc.repository.LessonRepository;
+import com.mooc.repository.CourseModuleRepository;
+import com.mooc.model.User;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,13 +16,26 @@ import java.util.List;
 public class LessonService {
 
     private final LessonRepository lessonRepository;
+    private final CourseModuleRepository moduleRepository;
 
-    public LessonService(LessonRepository lessonRepository) {
+    public LessonService(LessonRepository lessonRepository, CourseModuleRepository moduleRepository) {
         this.lessonRepository = lessonRepository;
+        this.moduleRepository = moduleRepository;
     }
 
-    public List<Lesson> findByModule(Long moduleId) {
+    @Transactional(readOnly = true)
+    public List<Lesson> findByModule(Long moduleId, User requester) {
+        CourseModule module = moduleRepository.findById(moduleId)
+                .orElseThrow(() -> ResourceNotFoundException.of("Module", moduleId));
+        assertCanView(module, requester);
         return lessonRepository.findByModuleIdOrderByOrderAsc(moduleId);
+    }
+
+    @Transactional(readOnly = true)
+    public Lesson findById(Long id, User requester) {
+        Lesson lesson = findById(id);
+        assertCanView(lesson.getModule(), requester);
+        return lesson;
     }
 
     public Lesson findById(Long id) {
@@ -26,9 +43,11 @@ public class LessonService {
                 .orElseThrow(() -> ResourceNotFoundException.of("Lesson", id));
     }
 
-    public Lesson create(Long moduleId, String title, String content, String videoUrl, Integer order) {
-        CourseModule module = new CourseModule();
-        module.setId(moduleId);
+    @Transactional
+    public Lesson create(Long moduleId, String title, String content, String videoUrl, Integer order, User requester) {
+        CourseModule module = moduleRepository.findById(moduleId)
+                .orElseThrow(() -> ResourceNotFoundException.of("Module", moduleId));
+        assertCanManage(module, requester);
 
         Lesson lesson = Lesson.builder()
                 .module(module)
@@ -41,15 +60,32 @@ public class LessonService {
         return lessonRepository.save(lesson);
     }
 
-    public Lesson update(Long id, String title, String content, String videoUrl) {
+    @Transactional
+    public Lesson update(Long id, String title, String content, String videoUrl, User requester) {
         Lesson lesson = findById(id);
+        assertCanManage(lesson.getModule(), requester);
         if (title != null) lesson.setTitle(title);
         if (content != null) lesson.setContent(content);
         if (videoUrl != null) lesson.setVideoUrl(videoUrl);
         return lessonRepository.save(lesson);
     }
 
-    public void delete(Long id) {
-        lessonRepository.deleteById(id);
+    @Transactional
+    public void delete(Long id, User requester) {
+        Lesson lesson = findById(id);
+        assertCanManage(lesson.getModule(), requester);
+        lessonRepository.delete(lesson);
+    }
+
+    private void assertCanManage(CourseModule module, User requester) {
+        if (requester.getRole() != User.Role.ADMIN &&
+                (module.getCourse().getInstructor() == null ||
+                        !module.getCourse().getInstructor().getId().equals(requester.getId()))) {
+            throw new AccessDeniedException("You can only manage lessons in your own courses");
+        }
+    }
+
+    private void assertCanView(CourseModule module, User requester) {
+        if (!module.getCourse().isPublished()) assertCanManage(module, requester);
     }
 }

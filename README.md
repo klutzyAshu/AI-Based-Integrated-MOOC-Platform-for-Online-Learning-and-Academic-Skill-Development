@@ -6,7 +6,9 @@ Neolce is a role-based online learning platform built with React, Spring Boot, a
 
 - JWT-based login and registration with student, instructor, and administrator roles
 - Course catalog, enrollment tracking, instructor course management, and role-aware dashboards
-- Course modules, lessons, quizzes, and persisted quiz attempts
+- Course modules, interactive lesson viewing, quizzes, and persisted quiz attempts
+- Lesson completion tracking with automatic certificates on course completion
+- Instructor course builder and admin/instructor enrollment analytics
 - AI assistant, recommendations, assessment generation, and study-plan request types
 - Responsive web interface and Docker Compose development environment
 
@@ -65,4 +67,4 @@ See `.env.example` for database, JWT, AI provider, storage, and frontend setting
 
 ## Project status
 
-This is an active development project. Course delivery and assessment foundations are present; progress tracking, certificates, and analytics remain represented in the schema and requirements but are not fully wired into the application yet.
+This is an active development project. Lesson progress, printable completion certificates, course and category authoring, and basic enrollment analytics are wired into the application. Broader reporting remains future work.

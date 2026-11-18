@@ -7,6 +7,7 @@ import Register from "./pages/auth/Register.jsx";
 
 import StudentDashboard from "./pages/student/Dashboard.jsx";
 import CourseView from "./pages/student/CourseView.jsx";
+import Certificate from "./pages/student/Certificate.jsx";
 
 import InstructorDashboard from "./pages/instructor/Dashboard.jsx";
 import AdminDashboard from "./pages/admin/Dashboard.jsx";
@@ -41,6 +42,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={["STUDENT", "INSTRUCTOR", "ADMIN"]}>
               <CourseView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/certificates/:courseId"
+          element={
+            <ProtectedRoute roles={["STUDENT"]}>
+              <Certificate />
             </ProtectedRoute>
           }
         />

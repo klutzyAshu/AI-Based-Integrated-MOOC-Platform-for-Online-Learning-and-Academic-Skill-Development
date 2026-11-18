@@ -45,14 +45,24 @@ public class UserController {
 
     @PatchMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<User> changeRole(@PathVariable Long id, @RequestParam User.Role role) {
+    public ResponseEntity<User> changeRole(@PathVariable Long id, @RequestParam User.Role role,
+                                           @AuthenticationPrincipal AppUserPrincipal principal) {
+        preventSelfLockout(id, principal);
         return ResponseEntity.ok(userService.changeRole(id, role));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
+    public ResponseEntity<Void> deactivate(@PathVariable Long id,
+                                            @AuthenticationPrincipal AppUserPrincipal principal) {
+        preventSelfLockout(id, principal);
         userService.deactivate(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void preventSelfLockout(Long targetId, AppUserPrincipal principal) {
+        if (principal != null && principal.getUser().getId().equals(targetId)) {
+            throw new org.springframework.security.access.AccessDeniedException("You cannot change or deactivate your own administrator account");
+        }
     }
 }

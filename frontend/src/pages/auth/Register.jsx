@@ -23,7 +23,15 @@ export default function Register() {
 
   return (
     <div className="auth-shell">
-      <aside className="auth-aside"><div><span className="eyebrow" style={{ color: "#b7d9c7" }}>A BETTER WAY TO LEARN</span><h2>Make room for what’s next.</h2><p>Join a community of curious learners and build skills through clear, structured courses.</p></div><span>Neolce · Online learning</span></aside>
+      <aside className="auth-aside">
+        <div className="auth-brand"><span className="brand-mark">N</span><span>Neolce</span></div>
+        <div className="auth-aside-copy">
+          <span className="auth-kicker">A FRESH PAGE</span>
+          <h2>Make room for what’s next.</h2>
+          <p>Start with a subject you’re curious about. Build from there, at your own pace.</p>
+        </div>
+        <span className="auth-aside-footer">A place to keep learning.</span>
+      </aside>
       <div className="auth-form-wrap"><form onSubmit={handleSubmit} className="auth-form">
         <h2>Create your account</h2><p>Start your learning journey today.</p>
         {error && <p className="auth-error" role="alert">{error}</p>}

@@ -4,6 +4,8 @@
 **Date:** November 16, 2026  
 **Environment:** Arch Linux x86_64 | Java 27 OpenJDK / Java 25 & 21 available | Maven 3.10.1 | Node.js v20+ | MariaDB 13.0.2  
 
+> **Status update — November 18, 2026:** This report is a historical snapshot; several findings below have since been addressed. The backend no longer uses Lombok and packages successfully. The frontend lockfile and ESLint configuration are present, and frontend lint and production builds pass. Learners can open lessons, take quizzes, track lesson completion and resume position, and receive a printable certificate after completing every lesson. Instructors can create, reorder, edit, and delete course modules and lessons. Administrators can manage categories. Admin and instructor analytics are available. Quiz answer keys are excluded from API JSON, answer indices are checked against each question's actual option count, and administrators cannot demote or deactivate their own account. Broader reporting remains limited. Docker access was unavailable during this update, so database-backed startup and end-to-end behavior remain unverified.
+
 ---
 
 ## 1. Executive Summary
